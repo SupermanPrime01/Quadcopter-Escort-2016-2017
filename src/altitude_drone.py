@@ -41,7 +41,7 @@ class ardrone():
 #        vel_msg = Twist()
 
     def move2alt(self):
-        goal_alt = Navdata()
+        #goal_alt = Navdata()
         #altitude in mm
         goal_alt = 1800 #input("Set your alt:")
         altitude_tolerance = 10

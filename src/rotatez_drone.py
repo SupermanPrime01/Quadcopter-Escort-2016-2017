@@ -29,7 +29,7 @@ class ardrone():
         return rotation
 
     def rotate2goal(self):
-        goal_rotZ = Navdata()
+        #goal_rotZ = Navdata()
         goal_rotZ = input("Set your rot Z goal:")
         rotation_tolerance = input("Set your tolerance:")
         vel_msg = Twist()

@@ -89,7 +89,7 @@ class Ardrone():
         return rotation
 
     def rotate2goal(self):
-        goal_rotZ = Navdata()
+        #goal_rotZ = Navdata()
         goal_rotZ = rotZ #input("Set your rot Z goal:")
 #        if goal_rotZ > 180:
 #            goal_rotZ = input("Set your rot Z goal between +180 & -180:")
@@ -132,7 +132,7 @@ if __name__ == '__main__':
         #Testing our function
         x = Ardrone()
         x.rotate2goal()
-    except rospy.ROSInterruptException: 
+    except rospy.ROSInterruptException:
         pass
 
 '''

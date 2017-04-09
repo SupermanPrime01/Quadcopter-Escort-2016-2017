@@ -60,8 +60,8 @@ if __name__ == '__main__':
 
 #    takeoff()
 
-    rospy.Duration(60*5)
-    while rospy.Time.now() <= rospy.Duration(60*5):
+    timeout = time.time() + 60
+    while time.time() <= timeout:
         move()
 
 
