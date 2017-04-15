@@ -100,7 +100,7 @@ class ardrone():
 if __name__ == '__main__':
     try:
 
-        x = ardrone()
-        x.move2alt()
+        ardrone = ardrone()
+        ardrone.move2alt()
 
     except rospy.ROSInterruptException: pass

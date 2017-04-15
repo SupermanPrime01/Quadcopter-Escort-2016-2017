@@ -28,6 +28,11 @@ class navdata_info(object):
         self.pitch = 0
         # Altitude
         self.altitude = 0
+        # Battery
+        self.battery = 0
+	# Magnetometer
+        self.magX = 0
+        self.magY = 0
         # These are switched for the controller purposes
         # Raw values taken from the QC
         self.tag_x      = 0
@@ -55,6 +60,11 @@ class navdata_info(object):
         self.navdata = data
         self.roll = math.radians(data.rotY)
         self.pitch = math.radians(data.rotX)
+        # battery
+        self.battery = data.batteryPercent
+	# mag
+	self.magX = data.magX
+	self.magY = data.magY
         if data.tags_count > 0:
             self.tag_acquired = True
             self.theta = self.navdata.tags_orientation[0] - 180
@@ -62,7 +72,6 @@ class navdata_info(object):
             self.prev_tag_x = self.tag_x
             self.tag_x = self.navdata.tags_yc[0]
             self.tag_vx = (self.tag_x - self.prev_tag_x) * self.rate
-
             self.prev_tag_y = self.tag_y
             self.tag_y = self.navdata.tags_xc[0]
             self.tag_vy = (self.tag_y - self.prev_tag_y) * self.rate
@@ -74,6 +83,7 @@ class navdata_info(object):
             self.norm_prev_tag_y = self.tag_y
             self.tag_norm_y = norm.real_position(self.tag_y - 500, self.altitude, self.roll)
             self.norm_tag_vy = (self.norm_tag_y - self.norm_prev_tag_y) * self.rate
+
 
             # Polar controller
             self.r = math.hypot(self.tag_x, self.tag_y)

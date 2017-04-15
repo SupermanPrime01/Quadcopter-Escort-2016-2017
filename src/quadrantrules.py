@@ -1,19 +1,20 @@
-#!/usr/bin/python
-# This will be a test script for the quadrant conditional statements
+#!/usr/bin/env python
 from math import *
 import time
+import rospy
+from std_msgs.msg import String
 
-GVlat = float(input("Input the GV Latitude:"))
-GVlong = float(input("Input the GV Longitude:"))
+def alpha(d_lat,d_long):
+    GVlat = float((input("Input the GV Latitude:")))
+    GVlong = float((input("Input the GV Longitude:")))
 
-QClat = float(input("Input the QC Latitude:"))
-QClong = float(input("Input the QC Longitude:"))
+    QClat = float((input("Input the QC Latitude:")))
+    QClong = float((input("Input the QC Longitude:")))
 
-#delta longitutde and delta latitude
-d_lat = float(GVlat - QClat)
-d_long = float(GVlong - QClong)
+    # delta longitutde and delta latitude
+    d_lat = float((GVlat - QClat))
+    d_long = float((GVlong - QClong))
 
-def theta(d_lat,d_long):
     global theta
     #Quadrant 1
     if d_lat > 0 and d_long > 0:
@@ -50,22 +51,42 @@ def theta(d_lat,d_long):
     print(theta)
 
 
-def rotZ(theta):
+#def rotZ(theta):
     #Quadrant I, II, III
     if theta >= 0 and theta <= 270:
-       rotZ = theta - 90
+       spin = theta - 90
 
     #Quadrant IV
     elif theta >= 271 and theta <= 360:
-        rotZ = -90 - (360-theta)
+        spin = -90 - (360-theta)
 
-    print(rotZ)
-    return rotZ
+    print(spin)
+    return spin
 
-while True:
-    theta(d_lat,d_long)
-    rotZ(theta)
+    pub = rospy.Publisher('spin_topic', String, queue_size=10)
+    rospy.init_node('spin_node', anonymous=True)
+    rate = rospy.Rate(1) # 10hz
+    while not rospy.is_shutdown():
+        rospy.loginfo(theta)
+        pub.publish(theta)
+        rate.sleep()
 
+while not rospy.is_shutdown():
+    if __name__ == '__main__':
+        # Starts a new node
+        try:
+            alpha(d_lat, d_long)
+        except rospy.ROSInterruptException:
+            pass
+
+
+'''        pub = rospy.Publisher('spin_topic', String, queue_size=20)
+        rospy.init_node('spin_node')
+        r = rospy.Rate(1) # 1hz
+        alpha(d_lat,d_long)
+        pub.publish(spin)
+#    rotZ(theta)
+'''
 
 
 '''Code to get theta to rotZ format

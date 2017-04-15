@@ -9,7 +9,7 @@ class AR():
     def __init__(self):
         #Creating our node,publisher and subscriber
         rospy.init_node('qc_controller', anonymous=True)
-        self.velocity_publisher = rospy.Publisher('/cmd_vel', Twist, queue_size=10)
+        self.velocity_publisher = rospy.Publisher('/cmd_vel', Twist, queue_size=1000)
         self.pose_subscriber = rospy.Subscriber('/ardrone/odometry', Odometry, self.callback)
         self.pose = Odometry()
         self.rate = rospy.Rate(10)
@@ -17,8 +17,9 @@ class AR():
     #Callback function implementing the pose value received
     def callback(self, data):
         self.pose = data
-        self.odometry.x = round(self.odometry.x, 4)
-        self.odometry.y = round(self.odometry.y, 4)
+        self.msg.pose.pose.position.x = round(self.msg.pose.pose.position.x, 4)
+        self.msg.pose.pose.position.y = round(self.msg.pose.pose.position.y, 4)
+        rospy.loginfo('x:{}, y:{}'.format(x, y))
 
     def get_distance(self, goal_x, goal_y):
         distance = sqrt(pow((goal_x - self.pose.x), 2) + pow((goal_y - self.pose.y), 2))
@@ -56,8 +57,10 @@ class AR():
 
 if __name__ == '__main__':
     try:
-        #Testing our function
-        x = AR()
-        x.move2goal()
+        timeout = time.time() + 60
+        while time.time() < timeout:
+            #Testing our function
+            x = AR()
+            x.move2goal()
 
     except rospy.ROSInterruptException: pass

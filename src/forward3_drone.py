@@ -1,8 +1,9 @@
 #!/usr/bin/env python
 import rospy
-from geometry_msgs.msg import Twist
+from geometry_msgs.msg  import Twist
 import time
-from std_msgs.msg         import String, Empty
+from std_msgs.msg       import String, Empty
+from nav_msgs.msg       import Odometry
 
 '''
 #Code for AR 2.0 stopping based off goal_pose
@@ -14,6 +15,11 @@ class GPS():
         self.velocity_publisher = rospy.Publisher('/cmd_vel', Twist, queue_size=1000)
         self.gps_subscriber = rospy.Subscriber('/gps/gpsnode', )
 '''
+#For positional data and will replace with GPS information
+def callback(msg):
+    x = msg.pose.pose.position.x
+    y = msg.pose.pose.position.y
+    rospy.loginfo('x: {}, y: {}'.format(x,y))
 
 def move(velocity_publisher):
     # Starts a new node
@@ -23,13 +29,17 @@ def move(velocity_publisher):
     print("Let's move your robot")
     speed = 1
     distance = input("Type your distance:")
+#   distance = hypotenuse variable
     isForward = input("Forward?: ")#True or False
 
     #Checking if the movement is forward or backwards
-    if(isForward):
+#   if(isForward):
+    if distance > 10:
         vel_msg.linear.x = abs(speed)
-    else:
+    elif distance < 6:
         vel_msg.linear.x = -abs(speed)
+    else:
+        vel_msg.linear.x = 0
     #Since we are moving just in x-axis
     vel_msg.linear.y = 0
     vel_msg.linear.z = 0
@@ -58,6 +68,8 @@ def move(velocity_publisher):
 if __name__ == '__main__':
     rospy.init_node('qc_forward', anonymous=True)
     velocity_publisher = rospy.Publisher('/cmd_vel', Twist, queue_size=1000)
+#   rospy.Subscriber("/odom",Odometry, callback)
+    rospy.spin()
     try:
         timeout = time.time() + 60
         while time.time() < timeout:

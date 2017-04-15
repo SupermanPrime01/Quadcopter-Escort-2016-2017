@@ -43,9 +43,9 @@ workbook = xlsxwriter.Workbook(filename)
 
 
 # Add the worksheet
-tag_x_workbook_sheet     = workbook.add_worksheet()
-tag_y_workbook_sheet     = workbook.add_worksheet()
-tag_theta_workbook_sheet = workbook.add_worksheet()
+tag_x_workbook_sheet     = workbook.add_worksheet('X Sheet')
+tag_y_workbook_sheet     = workbook.add_worksheet('Y Sheet')
+tag_theta_workbook_sheet = workbook.add_worksheet('Theta')
 
 
 # Widen the first column to make the text clearer.
@@ -74,6 +74,13 @@ tag_y_workbook_sheet.write('C1', 'Altitude')
 tag_y_workbook_sheet.write('D1', 'Roll')
 tag_y_workbook_sheet.write('E1', 'Pitch')
 
+#Battery
+tag_x_workbook_sheet.write('F1', 'Battery')
+
+#Magnetometer 
+tag_x_workbook_sheet.write('G1', 'magX')
+tag_x_workbook_sheet.write('H1', 'magY')
+
 # ROS initializations
 rospy.init_node('test_data_saver')
 rate = rospy.Rate(100)
@@ -81,25 +88,42 @@ rate = rospy.Rate(100)
 # So we can get the data from the bag
 nd = navdata_info()
 
-# To keep tack of what row we're in (start in row 2)
+# To keep track of what row we're in (start in row 2)
 i = 2
 
-while not rospy.is_shutdown():
-    # Write to each Excel file
-    # Division by 1,000,000 to convert from microseconds to seconds
-    tag_x_workbook_sheet.write('A{}'.format(i), nd.navdata.tm/1000000)
-    tag_x_workbook_sheet.write('B{}'.format(i), nd.tag_x)
-    tag_y_workbook_sheet.write('C{}'.format(i), nd.altitude)
-    tag_y_workbook_sheet.write('D{}'.format(i), nd.roll)
-    tag_y_workbook_sheet.write('E{}'.format(i), nd.pitch)
+start_time = 0
+current_time = 0
+time_set = False
 
-    tag_y_workbook_sheet.write('A{}'.format(i), nd.navdata.tm/1000000)
+while not rospy.is_shutdown():
+    # Division by 1,000,000 to convert from microseconds to seconds
+    current_time = nd.navdata.tm/1000000
+
+    # so that the time that's saved starts at 0 and not the QC's system time
+    # if you have issues, you can remove this without issue
+    if (not time_set and (current_time > 0)):
+        start_time = current_time
+        time_set = True
+
+    current_time -= start_time
+
+    # Write to each Excel file
+    tag_x_workbook_sheet.write('A{}'.format(i), current_time)
+    tag_x_workbook_sheet.write('B{}'.format(i), nd.tag_x)
+    tag_x_workbook_sheet.write('C{}'.format(i), nd.altitude)
+    tag_x_workbook_sheet.write('D{}'.format(i), nd.roll)
+    tag_x_workbook_sheet.write('E{}'.format(i), nd.pitch)
+    tag_x_workbook_sheet.write('F{}'.format(i), nd.battery)
+    tag_x_workbook_sheet.write('G{}'.format(i), nd.magX)
+    tag_x_workbook_sheet.write('H{}'.format(i), nd.magY)
+
+    tag_y_workbook_sheet.write('A{}'.format(i), current_time)
     tag_y_workbook_sheet.write('B{}'.format(i), nd.tag_y)
     tag_y_workbook_sheet.write('C{}'.format(i), nd.altitude)
     tag_y_workbook_sheet.write('D{}'.format(i), nd.roll)
     tag_y_workbook_sheet.write('E{}'.format(i), nd.pitch)
 
-    tag_theta_workbook_sheet.write('A{}'.format(i), nd.navdata.tm/1000000)
+    tag_theta_workbook_sheet.write('A{}'.format(i), current_time)
     tag_theta_workbook_sheet.write('B{}'.format(i), nd.theta)
 
     i += 1

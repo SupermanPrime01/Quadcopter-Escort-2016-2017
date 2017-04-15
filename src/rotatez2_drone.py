@@ -5,68 +5,8 @@ import time
 from geometry_msgs.msg import Twist
 from ardrone_autonomy.msg import Navdata
 from multiprocessing import Process
-from math import pow,atan2,sqrt
+from math import * #pow,atan2,sqrt
 PI = 3.1415926535897
-
-GVlat = float(input("Input the GV Latitude:"))
-GVlong = float(input("Input the GV Longitude:"))
-
-QClat = float(input("Input the QC Latitude:"))
-QClong = float(input("Input the QC Longitude:"))
-
-#delta longitutde and delta latitude
-d_lat = float(GVlat - QClat)
-d_long = float(GVlong - QClong)
-
-def theta(d_lat,d_long):
-    global theta
-    #Quadrant 1
-    if d_lat > 0 and d_long > 0:
-       theta = degrees(atan(d_long/d_lat))
-    elif d_long > 0 and d_lat == 0:
-        theta = 90
-    elif d_lat > 0 and d_long == 0:
-       theta = 0
-
-    #Quadrant 2
-    elif d_lat < 0 and d_long > 0:
-        theta = 180 - degrees(atan(d_long/abs(d_lat)))
-    elif d_long > 0 and d_lat == 0:
-        theta = 90
-    elif d_lat < 0 and d_long == 0:
-        theta = 180
-
-    #Quadrant 3
-    elif d_lat < 0 and d_long < 0:
-        theta = 180 + degrees(atan(d_long/d_lat))
-    elif d_long < 0 and d_lat == 0:
-        theta = 270
-    elif d_lat < 0  and d_long == 0:
-        theta = 180
-
-    #Quadrant 4
-    elif d_lat > 0 and d_long < 0:
-        theta = 360-degrees(atan(abs(d_long)/d_lat))
-    elif d_long < 0 and d_lat == 0:
-        theta = 270
-    elif d_lat > 0 and d_long == 0:
-        theta = 0
-
-    print(theta)
-
-
-def rotZ(theta):
-    #Quadrant I, II, III
-    if theta >= 0 and theta <= 270:
-       rotZ = theta - 90
-
-    #Quadrant IV
-    elif theta >= 271 and theta <= 360:
-        rotZ = -90 - (360-theta)
-
-    print(rotZ)
-
-    return rotZ
 
 class Ardrone():
 
@@ -89,15 +29,71 @@ class Ardrone():
         return rotation
 
     def rotate2goal(self):
+        GVlat = float(input("Input the GV Latitude:"))
+        GVlong = float(input("Input the GV Longitude:"))
+
+        QClat = float(input("Input the QC Latitude:"))
+        QClong = float(input("Input the QC Longitude:"))
+        #delta longitutde and delta latitude
+        d_lat = float(GVlat - QClat)
+        d_long = float(GVlong - QClong)
+        global theta
+        #Quadrant 1
+        if d_lat > 0 and d_long > 0:
+           theta = degrees(atan(d_long/d_lat))
+        elif d_long > 0 and d_lat == 0:
+            theta = 90
+        elif d_lat > 0 and d_long == 0:
+           theta = 0
+
+        #Quadrant 2
+        elif d_lat < 0 and d_long > 0:
+            theta = 180 - degrees(atan(d_long/abs(d_lat)))
+        elif d_long > 0 and d_lat == 0:
+            theta = 90
+        elif d_lat < 0 and d_long == 0:
+            theta = 180
+
+        #Quadrant 3
+        elif d_lat < 0 and d_long < 0:
+            theta = 180 + degrees(atan(d_long/d_lat))
+        elif d_long < 0 and d_lat == 0:
+            theta = 270
+        elif d_lat < 0  and d_long == 0:
+            theta = 180
+
+        #Quadrant 4
+        elif d_lat > 0 and d_long < 0:
+            theta = 360-degrees(atan(abs(d_long)/d_lat))
+        elif d_long < 0 and d_lat == 0:
+            theta = 270
+        elif d_lat > 0 and d_long == 0:
+            theta = 0
+
+        print(theta)
+
+
+    #def rotZ(theta):
+        #Quadrant I, II, III
+        if theta >= 0 and theta <= 270:
+           spin = theta - 90
+
+        #Quadrant IV
+        elif theta >= 271 and theta <= 360:
+            spin = -90 - (360-theta)
+
+        print(spin)
+        return spin
+
         #goal_rotZ = Navdata()
-        goal_rotZ = rotZ #input("Set your rot Z goal:")
+        goal_rotZ = spin #input("Set your rot Z goal:")
 #        if goal_rotZ > 180:
 #            goal_rotZ = input("Set your rot Z goal between +180 & -180:")
 #        elif goal_rotZ < -180:
 #            goal_rotZ = input("Set your rot Z goal between +180 & -180:")
-        # The input should be from 180 to -180.
+#       The input should be from 180 to -180.
         rotation_tolerance = 10 #input("Set your tolerance:")
-        # The tolerance should be about 10 degrees.
+#        The tolerance should be about 10 degrees.
         vel_msg = Twist()
 
         while goal_rotZ - self.navdata.rotZ >= rotation_tolerance:
@@ -129,9 +125,12 @@ class Ardrone():
 
 if __name__ == '__main__':
     try:
-        #Testing our function
-        x = Ardrone()
-        x.rotate2goal()
+        timeout = time.time() + 60
+        while time.time() < timeout:
+            #Testing our function
+            x = Ardrone()
+            x.rotate2goal()
+
     except rospy.ROSInterruptException:
         pass
 
