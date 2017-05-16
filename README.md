@@ -8,6 +8,7 @@ algorithms to allow autonomous flight of the AR.Drone 2.0.
 ### ROS
 * [rospy](http://wiki.ros.org/rospy/Tutorials)
 * [roscpp](http://wiki.ros.org/roscpp/Tutorials)
+* [nmea_navsat_driver](https://github.com/ros-drivers/nmea_navsat_driver) - [documentation](http://wiki.ros.org/nmea_navsat_driver)
 * [ardrone_autonomy](https://github.com/AutonomyLab/ardrone_autonomy) - [documentation](https://ardrone-autonomy.readthedocs.io/en/latest/)
 * [ardrone_tutorials](https://github.com/mikehamer/ardrone_tutorials) - [tutorials](http://robohub.org/tag/parrot-ar-drone-tutorial/)
 
