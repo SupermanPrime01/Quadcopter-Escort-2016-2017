@@ -27,6 +27,9 @@ def land():
 
 
 if __name__ == '__main__':
+
+    takeoff()
+'''
     p1 = Process(target = takeoff)
     p1.start()
 #p2 = Process(target = move2goal)
@@ -34,10 +37,12 @@ if __name__ == '__main__':
 #   p3 = Process(target = move2goal)
 #   p3 = start()
     time.sleep(300)
-    p1.shutdown()
     p2 = Process(target = land)
     p2.start()
+    time.sleep(10)
+    p1.shutdown()
 
+'''
 '''
 #Code that pulls QC odometry information and passes the info as a changing value
 class ardrone():

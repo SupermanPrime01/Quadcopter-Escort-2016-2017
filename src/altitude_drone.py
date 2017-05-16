@@ -98,6 +98,8 @@ class ardrone():
 
         rospy.spin()
 if __name__ == '__main__':
+#    rospy.init_node('qc_forward', anonymous=True)
+#    velocity_publisher = rospy.Publisher('/cmd_vel', Twist, queue_size=1000)
     try:
 
         ardrone = ardrone()

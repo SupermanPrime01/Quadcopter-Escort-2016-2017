@@ -6,6 +6,7 @@ from geometry_msgs.msg import Twist
 from ardrone_autonomy.msg import Navdata
 from nav_msgs.msg       import Odometry #This is where the QC's positional data is located
 from multiprocessing import Process
+from nmea_msgs import Sentence
 from math import * #pow,atan2,sqrt
 PI = 3.1415926535897
 
@@ -16,10 +17,10 @@ class QC():
         rospy.init_node('qc_controller', anonymous=True)
         self.velocity_publisher = rospy.Publisher('/cmd_vel', Twist, queue_size=1000)
         #Need to replace with GPS node
-#       self.navdata_subscriber = rospy.Subscriber('/ardrone/navdata', Navdata, self.callback)
+        self.navdata_subscriber = rospy.Subscriber('/fix', Sentence, self.callback)
         #Change this to GPS node
-#       self.navdata = Navdata()
-#       self.rate = rospy.Rate(10)
+        self.navdata = Sentence()
+        self.rate = rospy.Rate(10)
 
     #Callback function implementing the pose value received
     #Change callback function to QC GPS

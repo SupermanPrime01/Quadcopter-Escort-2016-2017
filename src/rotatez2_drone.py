@@ -16,19 +16,18 @@ class Ardrone():
         self.velocity_publisher = rospy.Publisher('/cmd_vel', Twist, queue_size=1000)
         self.navdata_subscriber = rospy.Subscriber('/ardrone/navdata', Navdata, self.callback)
         self.navdata = Navdata()
-        self.rate = rospy.Rate(10)
+        self.rate = rospy.Rate(100)
 
     #Callback function implementing the pose value received
     def callback(self, data):
         self.navdata = data
         self.navdata.rotZ = round(self.navdata.rotZ, 4)
 
-
     def get_rotZ(self, goal_rotZ):
         rotation = goal_rotZ - self.navdata.rotZ
         return rotation
 
-    def rotate2goal(self):
+    def theta_spin(self):
         GVlat = float(input("Input the GV Latitude:"))
         GVlong = float(input("Input the GV Longitude:"))
 
@@ -71,10 +70,9 @@ class Ardrone():
             theta = 0
 
         print(theta)
-
-
     #def rotZ(theta):
         #Quadrant I, II, III
+        global spin
         if theta >= 0 and theta <= 270:
            spin = theta - 90
 
@@ -85,6 +83,9 @@ class Ardrone():
         print(spin)
         return spin
 
+    def rotate2goal(self):
+        spin = Ardrone.theta_spin()
+#        self.spin = spin
         #goal_rotZ = Navdata()
         goal_rotZ = spin #input("Set your rot Z goal:")
 #        if goal_rotZ > 180:
@@ -92,7 +93,7 @@ class Ardrone():
 #        elif goal_rotZ < -180:
 #            goal_rotZ = input("Set your rot Z goal between +180 & -180:")
 #       The input should be from 180 to -180.
-        rotation_tolerance = 10 #input("Set your tolerance:")
+        rotation_tolerance = 1 #input("Set your tolerance:")
 #        The tolerance should be about 10 degrees.
         vel_msg = Twist()
 
@@ -107,11 +108,7 @@ class Ardrone():
             #angular velocity in the z-axis:
             vel_msg.angular.x = 0
             vel_msg.angular.y = 0
-            #negative values move the QC clockwise, positive values move the QC counter clockwise
-        if(goal_rotZ < 0):
-            vel_msg.angular.z = -40 * abs(goal_rotZ - self.navdata.rotZ)
-        else:
-            vel_msg.angular.z = 40 * abs(goal_rotZ - self.navdata.rotZ)
+            vel_msg.angular.z = 40 * (goal_rotZ - self.navdata.rotZ)
 
             #Publishing our vel_msg
             self.velocity_publisher.publish(vel_msg)

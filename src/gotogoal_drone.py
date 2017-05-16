@@ -3,6 +3,10 @@ import rospy
 from geometry_msgs.msg  import Twist
 from nav_msgs.msg import Odometry
 from math import pow,atan2,sqrt
+from std_msgs.msg import String
+from nmea_msgs.msg import Sentence
+from sensor_msgs.msg import NavSatFix
+import time
 
 class AR():
 
@@ -10,15 +14,15 @@ class AR():
         #Creating our node,publisher and subscriber
         rospy.init_node('qc_controller', anonymous=True)
         self.velocity_publisher = rospy.Publisher('/cmd_vel', Twist, queue_size=1000)
-        self.pose_subscriber = rospy.Subscriber('/ardrone/odometry', Odometry, self.callback)
-        self.pose = Odometry()
+        self.pose_subscriber = rospy.Subscriber('/fix', NavSatFix, self.callback)
+        self.pose = NavSatFix()
         self.rate = rospy.Rate(10)
 
     #Callback function implementing the pose value received
     def callback(self, data):
         self.pose = data
-        self.msg.pose.pose.position.x = round(self.msg.pose.pose.position.x, 4)
-        self.msg.pose.pose.position.y = round(self.msg.pose.pose.position.y, 4)
+        self.latitude = round(self.msg.pose.pose.position.x, 4)
+        self.longitude = round(self.msg.pose.pose.position.y, 4)
         rospy.loginfo('x:{}, y:{}'.format(x, y))
 
     def get_distance(self, goal_x, goal_y):

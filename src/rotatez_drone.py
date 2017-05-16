@@ -30,8 +30,8 @@ class ardrone():
 
     def rotate2goal(self):
         #goal_rotZ = Navdata()
-        goal_rotZ = input("Set your rot Z goal:")
-        rotation_tolerance = input("Set your tolerance:")
+        goal_rotZ = 0 #input("Set your rot Z goal:")
+        rotation_tolerance = 5 #input("Set your tolerance:")
         vel_msg = Twist()
 
         while goal_rotZ - self.navdata.rotZ >= rotation_tolerance:
