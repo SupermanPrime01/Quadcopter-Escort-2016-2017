@@ -21,48 +21,25 @@ class Forward():
             rospy.loginfo_throttle(10, self.data.data)
         hyp_ft = self.data
 
-    '''
-    def listener():
+'''Moving Average
 
-        # In ROS, nodes are uniquely named. If two nodes with the same
-        # node are launched, the previous one is kicked off. The
-        # anonymous=True flag means that rospy will choose a unique
-        # name for our 'listener' node so that multiple listeners can
-        # run simultaneously.
-        rospy.init_node('listener', anonymous=True)
-        rospy.Subscriber("gps_dist", Float32, callback)
-        # spin() simply keeps python from exiting until this node is stopped
-        rospy.spin()
+history = []
 
-
-    def calc_distance(gps1, gps2):
-        gps1_lat = round(gps1.latitude, 6)
-        gps1_lon = round(gps1.longitude, 6)
-        gps2_lat = round(gps2.latitude, 6)
-        gps2_lon = round(gps2.longitude, 6)
-        delta_lat = (gps1_lat*(108000) - gps2_lat*(108000))
-        delta_lon = (gps1_lon*(108000) - gps2_lon*(108000))
-        hyp_m = (delta_lat**2 + delta_lon**2)**0.5
-        hyp_ft = (hyp_m*3.2800839)
-
-        pub = rospy.Publisher("gps_dist", Float32, queue_size=10)
-        rate = rospy.Rate(1)
-        while not rospy.is_shutdown():
-            rospy.loginfo("Distance is %s in ft.", hyp_ft)
-    #        rospy.loginfo(hyp_ft)
-            pub.publish(hyp_ft)
-            rate.sleep()
+def callback(msg):
+    global history
+    history.append(msg.data)
+    if len(history) > 60:
+        history = history[-60:]
+    average = sum(history) / float(len(history))
+    rospy.loginfo('Average of most recent {} samples: {}'.format(len(history), average))
 
 
-    def listener():
-    #    rospy.init_node('gps_monitor', anonymous=True)
-        gps1 = message_filters.Subscriber('/fix', NavSatFix)
-        gps2 = message_filters.Subscriber('/fix1', NavSatFix)
-        ts = message_filters.ApproximateTimeSynchronizer([gps1, gps2], 10, 5)
-        ts.registerCallback(calc_distance)
-        rospy.spin()
-    '''
-
+n = rospy.init_node('moving_average')
+s = rospy.Subscriber('/numbers', Int32, callback)
+rospy.spin()
+        
+'''
+        
     def move(self, velocity_publisher):
         vel_msg = Twist()
         hyp_ft = self.data.data
